@@ -2,19 +2,86 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <fstream>
+
+#include "TransformChar.hpp"
+
+bool processCommandLine(
+const std::vector<std::string>& ,
+bool& ,
+bool& ,
+std::string& ,
+std::string&  );
+
+
 
 int main(int argc, char* argv[])
 {
     // Convert the command-line arguments into a more easily usable form
     const std::vector<std::string> cmdLineArgs{argv, argv + argc};
-    const std::size_t nCmdLineArgs{cmdLineArgs.size()};
 
     // Options that might be set by the command-line arguments
     bool helpRequested{false};
     bool versionRequested{false};
+    bool proceed{0};
     std::string inputFile{""};
     std::string outputFile{""};
 
+
+    proceed = processCommandLine(
+     cmdLineArgs,
+     helpRequested,
+     versionRequested,
+     inputFile,
+     outputFile );
+    
+    if (!proceed){
+        return 1;
+    };
+    
+    // Initialise variables
+    char inputChar{'x'};
+    std::string in_Text;
+
+
+    // Read in user input from stdin/file
+    // Warn that input file option not yet implemented
+    if (!inputFile.empty()) {
+        std::cerr << "[warning] input from file ('" << inputFile
+                  << "') not implemented yet, using stdin\n";
+    }
+
+    // loop over each character from user input
+    while (std::cin >> inputChar) {
+        in_Text += transformChar( inputChar );
+
+    }
+
+    // Print out the transliterated text
+
+    // Warn that output file option not yet implemented
+    if (!outputFile.empty()) {
+        std::cerr << "[warning] output to file ('" << outputFile
+                  << "') not implemented yet, using stdout\n";
+    }
+
+    std::cout << in_Text << std::endl;
+
+    // No requirement to return from main, but we do so for clarity
+    // and for consistency with other functions
+    return 0;
+}
+
+
+
+
+bool processCommandLine(
+const std::vector<std::string>& cmdLineArgs,
+bool& helpRequested,
+bool& versionRequested,
+std::string& inputFileName,
+std::string& outputFileName ) {
+    const std::size_t nCmdLineArgs{cmdLineArgs.size()};
     // Process command line arguments - ignore zeroth element, as we know this
     // to be the program name and don't need to worry about it
     for (std::size_t i{1}; i < nCmdLineArgs; ++i) {
@@ -32,7 +99,7 @@ int main(int argc, char* argv[])
                 return 1;
             } else {
                 // Got filename, so assign value and advance past it
-                inputFile = cmdLineArgs[i + 1];
+                inputFileName = cmdLineArgs[i + 1];
                 ++i;
             }
         } else if (cmdLineArgs[i] == "-o") {
@@ -45,7 +112,7 @@ int main(int argc, char* argv[])
                 return 1;
             } else {
                 // Got filename, so assign value and advance past it
-                outputFile = cmdLineArgs[i + 1];
+                outputFileName = cmdLineArgs[i + 1];
                 ++i;
             }
         } else {
@@ -83,74 +150,6 @@ int main(int argc, char* argv[])
         std::cout << "0.1.0" << std::endl;
         return 0;
     }
-
-    // Initialise variables
-    char inputChar{'x'};
-    std::string inputText;
-
-    // Read in user input from stdin/file
-    // Warn that input file option not yet implemented
-    if (!inputFile.empty()) {
-        std::cerr << "[warning] input from file ('" << inputFile
-                  << "') not implemented yet, using stdin\n";
-    }
-
-    // loop over each character from user input
-    while (std::cin >> inputChar) {
-        // Uppercase alphabetic characters
-        if (std::isalpha(inputChar)) {
-            inputText += std::toupper(inputChar);
-            continue;
-        }
-
-        // Transliterate digits to English words
-        switch (inputChar) {
-            case '0':
-                inputText += "ZERO";
-                break;
-            case '1':
-                inputText += "ONE";
-                break;
-            case '2':
-                inputText += "TWO";
-                break;
-            case '3':
-                inputText += "THREE";
-                break;
-            case '4':
-                inputText += "FOUR";
-                break;
-            case '5':
-                inputText += "FIVE";
-                break;
-            case '6':
-                inputText += "SIX";
-                break;
-            case '7':
-                inputText += "SEVEN";
-                break;
-            case '8':
-                inputText += "EIGHT";
-                break;
-            case '9':
-                inputText += "NINE";
-                break;
-        }
-
-        // If the character isn't alphabetic or numeric, DONT add it
-    }
-
-    // Print out the transliterated text
-
-    // Warn that output file option not yet implemented
-    if (!outputFile.empty()) {
-        std::cerr << "[warning] output to file ('" << outputFile
-                  << "') not implemented yet, using stdout\n";
-    }
-
-    std::cout << inputText << std::endl;
-
-    // No requirement to return from main, but we do so for clarity
-    // and for consistency with other functions
     return 0;
-}
+
+};
